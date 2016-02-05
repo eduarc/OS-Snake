@@ -1,2 +1,2 @@
-# Snake
-Snake Video Game (2011)
+# Snake (2011)
+Snake Video Game
