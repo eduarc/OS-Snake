@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Script para generar lo binarios automaticamente
+# Cualquier fuente nueva debe ser agregada en este script
+# Estaba haciendo un pequenio ping-pong pero no lo termine (me dio pereza)
+
+CFLAGS="-fomit-frame-pointer -fno-builtin -nostdinc -O2 -I. -I./gsk/ -c"
+#CFLAGS="-I. -I./gsk/ -c"
+
+LDFLAGS="-nostdlib -nostartfiles -nodefaultlibs -N -Ttext 0x7E00 -e _start --oformat binary"
+
+rm -f *.o *~ *.bin *.img
+
+nasm boot.asm -o boot.o
+nasm -f aout loader.asm -o loader.o
+nasm -f aout ./gsk/defs.asm -o defs.o
+nasm -f aout ./gsk/interrupt.asm -o interrupt.o
+
+gcc $CFLAGS ./gsk/string.c
+gcc $CFLAGS ./gsk/utils.c
+gcc $CFLAGS ./gsk/screen.c
+gcc $CFLAGS ./gsk/descriptor_tables.c
+gcc $CFLAGS ./gsk/isr.c
+gcc $CFLAGS ./gsk/keyboard.c
+gcc $CFLAGS ./gsk/timer.c
+gcc $CFLAGS ./gsk/sound.c
+gcc $CFLAGS ./gsk/gsk.c
+
+gcc $CFLAGS snake.c
+#gcc $CFLAGS ping_pong.c
+gcc $CFLAGS kmain.c
+
+ld $LDFLAGS -o kernel.bin loader.o defs.o interrupt.o string.o utils.o screen.o descriptor_tables.o isr.o keyboard.o timer.o sound.o gsk.o snake.o kmain.o
+
+cat boot.o kernel.bin > floppy.tmp
+
+# He escrito floppywriter para facilitarme el trabajo
+./floppywriter floppy.img floppy.tmp
+
+rm -f *.o *~ *.tmp
