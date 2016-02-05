@@ -50,6 +50,7 @@ void *malloc(int nbytes) {
       curr->next = new_mem;
       return new_mem->ptr;
     }
+    curr = curr->next;
   }
   return NULL;
 }
