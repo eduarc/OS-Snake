@@ -27,6 +27,10 @@ void init_mem() {
   root->length = 0;
   root->ptr = NULL;
   root->next = tail;
+  tail->prev = next;
+  tail->next = NULL;
+  tail->length = 0;
+  tail->ptr = NULL;
 }
 
 void *malloc(int nbytes) {
